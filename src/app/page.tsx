@@ -1,65 +1,224 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
+import PetCard from '@/components/pets/PetCard';
+import type { Pet } from '@/lib/database.types';
 
-export default function Home() {
+export default async function HomePage() {
+  let featuredPets: Pet[] = [];
+
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from('pets')
+      .select('*')
+      .eq('status', 'available')
+      .order('created_at', { ascending: false })
+      .limit(6);
+
+    featuredPets = (data as Pet[]) || [];
+  } catch {
+    // Supabase not configured yet — that's fine
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden pt-16">
+        {/* Background */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-secondary/15 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-3xl" />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium mb-6 animate-fade-in-up">
+              <span>🐾</span>
+              <span>ช่วยสัตว์เลี้ยง ช่วยโลก</span>
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              ช่วยหา
+              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                บ้านใหม่
+              </span>
+              <br />
+              ให้เพื่อนสี่ขา
+            </h1>
+
+            <p className="mt-6 text-lg sm:text-xl text-muted-foreground leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              แพลตฟอร์มเพื่อสัตว์เลี้ยงที่กำลังมองหาครอบครัวใหม่
+              <br className="hidden sm:block" />
+              เพราะทุกชีวิตสมควรได้รับความรัก 🧡
+            </p>
+
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              <Link
+                href="/pets"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-dark px-8 py-4 text-lg font-bold text-white shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:scale-105 transition-all"
+              >
+                🏠 ดูสัตว์เลี้ยงทั้งหมด
+              </Link>
+              <Link
+                href="/pets/new"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border-2 border-border px-8 py-4 text-lg font-bold hover:border-primary hover:text-primary transition-all"
+              >
+                📝 ลงประกาศหาบ้าน
+              </Link>
+            </div>
+          </div>
+
+          {/* Floating emojis */}
+          <div className="absolute top-32 left-10 text-4xl animate-float opacity-20">🐕</div>
+          <div className="absolute top-48 right-16 text-3xl animate-float opacity-20" style={{ animationDelay: '1s' }}>🐈</div>
+          <div className="absolute bottom-20 left-20 text-3xl animate-float opacity-20" style={{ animationDelay: '2s' }}>🐰</div>
+          <div className="absolute bottom-32 right-24 text-4xl animate-float opacity-20" style={{ animationDelay: '0.5s' }}>🐦</div>
         </div>
-      </main>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 bg-muted/50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+            {[
+              { emoji: '🐾', number: '500+', label: 'สัตว์ได้บ้านใหม่' },
+              { emoji: '👥', number: '1,200+', label: 'ผู้ใช้งาน' },
+              { emoji: '🏡', number: '300+', label: 'ครอบครัวใหม่' },
+              { emoji: '❤️', number: '50+', label: 'มูลนิธิร่วมมือ' },
+            ].map((stat, i) => (
+              <div key={i} className="text-center p-6 bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-3xl mb-2">{stat.emoji}</div>
+                <div className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  {stat.number}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Pets */}
+      <section className="py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold">
+              น้องๆ ที่กำลัง
+              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                รอบ้านใหม่
+              </span>
+            </h2>
+            <p className="text-muted-foreground mt-3">เปิดใจให้น้องๆ ได้เป็นส่วนหนึ่งของครอบครัวคุณ</p>
+          </div>
+
+          {featuredPets.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredPets.map((pet) => (
+                <PetCard key={pet.id} pet={pet} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 bg-card rounded-2xl border border-border">
+              <div className="text-6xl mb-4">🐾</div>
+              <h3 className="text-xl font-bold mb-2">ยังไม่มีประกาศ</h3>
+              <p className="text-muted-foreground mb-6">เป็นคนแรกที่ลงประกาศหาบ้านให้น้อง!</p>
+              <Link
+                href="/pets/new"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-white font-bold hover:bg-primary-dark transition-colors"
+              >
+                📝 ลงประกาศเลย
+              </Link>
+            </div>
+          )}
+
+          {featuredPets.length > 0 && (
+            <div className="text-center mt-10">
+              <Link
+                href="/pets"
+                className="inline-flex items-center gap-2 rounded-full border-2 border-primary text-primary px-8 py-3 font-bold hover:bg-primary hover:text-white transition-all"
+              >
+                ดูทั้งหมด →
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="py-16 sm:py-20 bg-muted/30">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold">ขั้นตอนง่ายๆ</h2>
+            <p className="text-muted-foreground mt-3">หาบ้านให้น้องใน 3 ขั้นตอน</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                step: '01',
+                emoji: '📝',
+                title: 'ลงประกาศ',
+                desc: 'ลงข้อมูลและรูปภาพของน้องที่ต้องการหาบ้าน',
+              },
+              {
+                step: '02',
+                emoji: '🔍',
+                title: 'ค้นหา & เลือก',
+                desc: 'ผู้สนใจค้นหาและเลือกน้องที่ถูกใจ',
+              },
+              {
+                step: '03',
+                emoji: '🏡',
+                title: 'ได้บ้านใหม่',
+                desc: 'ติดต่อพูดคุยและรับน้องไปเป็นส่วนหนึ่งของครอบครัว',
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="relative bg-card rounded-2xl border border-border p-8 text-center hover:shadow-lg hover:-translate-y-1 transition-all group"
+              >
+                <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg">
+                  {item.step}
+                </div>
+                <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">
+                  {item.emoji}
+                </div>
+                <h3 className="text-lg font-bold mb-2">{item.title}</h3>
+                <p className="text-muted-foreground text-sm">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative overflow-hidden bg-gradient-to-r from-primary to-secondary rounded-3xl p-8 sm:p-12 text-center text-white">
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-40 h-40 bg-white rounded-full blur-3xl" />
+              <div className="absolute bottom-0 right-0 w-60 h-60 bg-white rounded-full blur-3xl" />
+            </div>
+            <div className="relative">
+              <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
+                พร้อมช่วยน้องๆ แล้วหรือยัง?
+              </h2>
+              <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
+                ทุกการแชร์ ทุกการรับเลี้ยง คือการให้ชีวิตใหม่แก่สัตว์ที่ต้องการบ้าน
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link
+                  href="/auth/register"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-white text-primary px-8 py-4 text-lg font-bold shadow-xl hover:scale-105 transition-all"
+                >
+                  เริ่มต้นเลย 🚀
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
