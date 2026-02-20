@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { Pet, PetSpecies, PetGender } from '@/lib/database.types';
 import { THAI_PROVINCES } from '@/lib/thai-provinces';
+import { PET_BREEDS } from '@/lib/data/breeds';
 
 const speciesOptions: { value: PetSpecies; label: string }[] = [
     { value: 'dog', label: '🐕 สุนัข' },
@@ -30,11 +31,21 @@ export default function PetForm({ pet, userId }: PetFormProps) {
     const supabase = createClient();
     const isEditing = !!pet;
 
+    let initialYears = '';
+    let initialMonths = '';
+    if (pet?.age_text) {
+        const yearMatch = pet.age_text.match(/(\d+)\s*ปี/);
+        const monthMatch = pet.age_text.match(/(\d+)\s*เดือน/);
+        if (yearMatch) initialYears = yearMatch[1];
+        if (monthMatch) initialMonths = monthMatch[1];
+    }
+
     const [formData, setFormData] = useState({
         name: pet?.name || '',
         species: pet?.species || ('dog' as PetSpecies),
         breed: pet?.breed || '',
-        age_text: pet?.age_text || '',
+        ageYears: initialYears,
+        ageMonths: initialMonths,
         gender: pet?.gender || ('unknown' as PetGender),
         description: pet?.description || '',
         province: pet?.province || '',
@@ -47,6 +58,15 @@ export default function PetForm({ pet, userId }: PetFormProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const errorRef = useRef<HTMLDivElement>(null);
+
+    // Breed dropdown state
+    const [breedOpen, setBreedOpen] = useState(false);
+    const breedRef = useRef<HTMLDivElement>(null);
+
+    const availableBreeds = PET_BREEDS[formData.species] || [];
+    const filteredBreeds = availableBreeds.filter((b) =>
+        b.toLowerCase().includes((formData.breed || '').toLowerCase())
+    );
 
     // Province searchable dropdown state
     const [provinceOpen, setProvinceOpen] = useState(false);
@@ -61,6 +81,9 @@ export default function PetForm({ pet, userId }: PetFormProps) {
         const handleClickOutside = (e: MouseEvent) => {
             if (provinceRef.current && !provinceRef.current.contains(e.target as Node)) {
                 setProvinceOpen(false);
+            }
+            if (breedRef.current && !breedRef.current.contains(e.target as Node)) {
+                setBreedOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -143,8 +166,16 @@ export default function PetForm({ pet, userId }: PetFormProps) {
                 image_urls = await uploadImages();
             }
 
+            let finalAgeText = '';
+            if (formData.ageYears) finalAgeText += `${formData.ageYears} ปี `;
+            if (formData.ageMonths) finalAgeText += `${formData.ageMonths} เดือน`;
+            finalAgeText = finalAgeText.trim();
+
+            const { ageYears, ageMonths, ...restFormData } = formData;
+
             const payload = {
-                ...formData,
+                ...restFormData,
+                age_text: finalAgeText,
                 image_urls,
                 owner_id: userId,
                 updated_at: new Date().toISOString(),
@@ -205,19 +236,24 @@ export default function PetForm({ pet, userId }: PetFormProps) {
                     <label htmlFor="species" className="block text-sm font-medium mb-2">
                         ชนิดสัตว์ <span className="text-danger">*</span>
                     </label>
-                    <select
-                        id="species"
-                        name="species"
-                        value={formData.species}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-xl bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
-                    >
+                    <div className="flex flex-wrap gap-2">
                         {speciesOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                            </option>
+                            <button
+                                key={opt.value}
+                                type="button"
+                                onClick={() =>
+                                    setFormData((prev) => ({ ...prev, species: opt.value }))
+                                }
+                                className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-all ${formData.species === opt.value
+                                    ? 'bg-primary text-white border-primary shadow-lg shadow-primary/25 scale-105'
+                                    : 'bg-muted border-border hover:border-primary/50 text-foreground hover:bg-background'
+                                    }`}
+                            >
+                                <span className="text-lg">{opt.label.split(' ')[0]}</span>
+                                <span>{opt.label.split(' ')[1]}</span>
+                            </button>
                         ))}
-                    </select>
+                    </div>
                 </div>
 
                 <div>
@@ -246,7 +282,7 @@ export default function PetForm({ pet, userId }: PetFormProps) {
 
             {/* Breed & Age row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
+                <div ref={breedRef} className="relative">
                     <label htmlFor="breed" className="block text-sm font-medium mb-2">
                         สายพันธุ์
                     </label>
@@ -255,25 +291,71 @@ export default function PetForm({ pet, userId }: PetFormProps) {
                         name="breed"
                         type="text"
                         value={formData.breed}
-                        onChange={handleChange}
-                        placeholder="เช่น พันธุ์ไทย, ชิวาวา"
+                        onChange={(e) => {
+                            handleChange(e);
+                            setBreedOpen(true);
+                        }}
+                        onFocus={() => setBreedOpen(true)}
+                        placeholder="เช่น ชิวาวา (พิมพ์เพื่อค้นหา)"
                         className="w-full px-4 py-3 rounded-xl bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                        autoComplete="off"
                     />
+                    {breedOpen && filteredBreeds.length > 0 && (
+                        <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                            <ul className="max-h-48 overflow-y-auto py-1">
+                                {filteredBreeds.map((b) => (
+                                    <li key={b}>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setFormData((prev) => ({ ...prev, breed: b }));
+                                                setBreedOpen(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 hover:text-primary transition-colors"
+                                        >
+                                            {b}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
 
                 <div>
-                    <label htmlFor="age_text" className="block text-sm font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2">
                         อายุ
                     </label>
-                    <input
-                        id="age_text"
-                        name="age_text"
-                        type="text"
-                        value={formData.age_text}
-                        onChange={handleChange}
-                        placeholder="เช่น 2 ปี, 3 เดือน"
-                        className="w-full px-4 py-3 rounded-xl bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                    />
+                    <div className="flex gap-2">
+                        <div className="relative flex-1">
+                            <input
+                                id="ageYears"
+                                name="ageYears"
+                                type="number"
+                                min="0"
+                                max="30"
+                                value={formData.ageYears}
+                                onChange={handleChange}
+                                placeholder="0"
+                                className="w-full px-4 py-3 rounded-xl bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all pr-12"
+                            />
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">ปี</span>
+                        </div>
+                        <div className="relative flex-1">
+                            <input
+                                id="ageMonths"
+                                name="ageMonths"
+                                type="number"
+                                min="0"
+                                max="11"
+                                value={formData.ageMonths}
+                                onChange={handleChange}
+                                placeholder="0"
+                                className="w-full px-4 py-3 rounded-xl bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all pr-14"
+                            />
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">เดือน</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 

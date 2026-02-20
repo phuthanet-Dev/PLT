@@ -34,11 +34,16 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium mb-6 animate-fade-in-up">
-              <span>🐾</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.5C10 2.5 8.5 4 8.5 6C8.5 8.5 12 11 12 11C12 11 15.5 8.5 15.5 6C15.5 4 14 2.5 12 2.5Z" />
+                <path d="M7 6.5C5.5 6.5 4 8 4 9.5C4 11.5 7 13 7 13C7 13 10 11.5 10 9.5C10 8 8.5 6.5 7 6.5Z" />
+                <path d="M17 6.5C15.5 6.5 14 8 14 9.5C14 11.5 17 13 17 13C17 13 20 11.5 20 9.5C20 8 18.5 6.5 17 6.5Z" />
+                <path d="M12 12.5C8 12.5 5 15 5 18C5 21 8.5 22 12 22C15.5 22 19 21 19 18C19 15 16 12.5 12 12.5Z" />
+              </svg>
               <span>ช่วยสัตว์เลี้ยง ช่วยโลก</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight animate-fade-in-up text-foreground" style={{ animationDelay: '0.1s' }}>
               ช่วยหา
               <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 บ้านใหม่
@@ -50,30 +55,62 @@ export default async function HomePage() {
             <p className="mt-6 text-lg sm:text-xl text-muted-foreground leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               แพลตฟอร์มเพื่อสัตว์เลี้ยงที่กำลังมองหาครอบครัวใหม่
               <br className="hidden sm:block" />
-              เพราะทุกชีวิตสมควรได้รับความรัก 🧡
+              ด้วยความอบอุ่นแบบครอบครัวเดียวกัน
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
               <Link
                 href="/pets"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-dark px-8 py-4 text-lg font-bold text-white shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:scale-105 transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-dark px-8 py-4 text-lg font-bold text-white shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-1 transition-all"
               >
-                🏠 ดูสัตว์เลี้ยงทั้งหมด
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                </svg>
+                ดูสัตว์เลี้ยงทั้งหมด
               </Link>
               <Link
                 href="/pets/new"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border-2 border-border px-8 py-4 text-lg font-bold hover:border-primary hover:text-primary transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary text-primary bg-primary/5 px-8 py-4 text-lg font-bold hover:bg-primary hover:text-white hover:-translate-y-1 transition-all"
               >
-                📝 ลงประกาศหาบ้าน
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+                ลงประกาศหาบ้าน
               </Link>
             </div>
           </div>
 
-          {/* Floating emojis */}
-          <div className="absolute top-32 left-10 text-4xl animate-float opacity-20">🐕</div>
-          <div className="absolute top-48 right-16 text-3xl animate-float opacity-20" style={{ animationDelay: '1s' }}>🐈</div>
-          <div className="absolute bottom-20 left-20 text-3xl animate-float opacity-20" style={{ animationDelay: '2s' }}>🐰</div>
-          <div className="absolute bottom-32 right-24 text-4xl animate-float opacity-20" style={{ animationDelay: '0.5s' }}>🐦</div>
+          {/* Floating SVGs */}
+          {/* Paw Top Left */}
+          <div className="absolute top-32 left-10 text-primary animate-float opacity-20" style={{ animationDelay: '0s' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor" className="-rotate-12">
+              <path d="M12 2.5C10 2.5 8.5 4 8.5 6C8.5 8.5 12 11 12 11C12 11 15.5 8.5 15.5 6C15.5 4 14 2.5 12 2.5Z" />
+              <path d="M7 6.5C5.5 6.5 4 8 4 9.5C4 11.5 7 13 7 13C7 13 10 11.5 10 9.5C10 8 8.5 6.5 7 6.5Z" />
+              <path d="M17 6.5C15.5 6.5 14 8 14 9.5C14 11.5 17 13 17 13C17 13 20 11.5 20 9.5C20 8 18.5 6.5 17 6.5Z" />
+              <path d="M12 12.5C8 12.5 5 15 5 18C5 21 8.5 22 12 22C15.5 22 19 21 19 18C19 15 16 12.5 12 12.5Z" />
+            </svg>
+          </div>
+          {/* Paw Bottom Right */}
+          <div className="absolute bottom-32 right-24 text-secondary animate-float opacity-20" style={{ animationDelay: '1s' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="currentColor" className="rotate-12">
+              <path d="M12 2.5C10 2.5 8.5 4 8.5 6C8.5 8.5 12 11 12 11C12 11 15.5 8.5 15.5 6C15.5 4 14 2.5 12 2.5Z" />
+              <path d="M7 6.5C5.5 6.5 4 8 4 9.5C4 11.5 7 13 7 13C7 13 10 11.5 10 9.5C10 8 8.5 6.5 7 6.5Z" />
+              <path d="M17 6.5C15.5 6.5 14 8 14 9.5C14 11.5 17 13 17 13C17 13 20 11.5 20 9.5C20 8 18.5 6.5 17 6.5Z" />
+              <path d="M12 12.5C8 12.5 5 15 5 18C5 21 8.5 22 12 22C15.5 22 19 21 19 18C19 15 16 12.5 12 12.5Z" />
+            </svg>
+          </div>
+          {/* Heart Top Right */}
+          <div className="absolute top-48 right-16 text-accent animate-float opacity-30" style={{ animationDelay: '0.5s' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor" className="rotate-3">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          </div>
+          {/* Heart Bottom Left */}
+          <div className="absolute bottom-20 left-20 text-danger animate-float opacity-20" style={{ animationDelay: '2s' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor" className="-rotate-6">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          </div>
         </div>
       </section>
 

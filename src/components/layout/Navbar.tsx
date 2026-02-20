@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { Session, User } from '@supabase/supabase-js';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function Navbar() {
     const [user, setUser] = useState<User | null>(null);
@@ -70,8 +71,15 @@ export default function Navbar() {
                 <div className="flex h-16 items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2 group">
-                        <span className="text-3xl transition-transform group-hover:scale-110">🐾</span>
-                        <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        <div className="text-primary group-hover:animate-wag transition-transform origin-bottom">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.5C10 2.5 8.5 4 8.5 6C8.5 8.5 12 11 12 11C12 11 15.5 8.5 15.5 6C15.5 4 14 2.5 12 2.5Z" />
+                                <path d="M7 6.5C5.5 6.5 4 8 4 9.5C4 11.5 7 13 7 13C7 13 10 11.5 10 9.5C10 8 8.5 6.5 7 6.5Z" />
+                                <path d="M17 6.5C15.5 6.5 14 8 14 9.5C14 11.5 17 13 17 13C17 13 20 11.5 20 9.5C20 8 18.5 6.5 17 6.5Z" />
+                                <path d="M12 12.5C8 12.5 5 15 5 18C5 21 8.5 22 12 22C15.5 22 19 21 19 18C19 15 16 12.5 12 12.5Z" />
+                            </svg>
+                        </div>
+                        <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent tracking-tight">
                             PalangTas
                         </span>
                     </Link>
@@ -83,6 +91,12 @@ export default function Navbar() {
                             className="text-foreground/70 hover:text-primary transition-colors font-medium"
                         >
                             หาบ้านให้สัตว์
+                        </Link>
+                        <Link
+                            href="/blog"
+                            className="text-foreground/70 hover:text-primary transition-colors font-medium"
+                        >
+                            บทความ
                         </Link>
                         {user && (
                             <Link
@@ -96,6 +110,7 @@ export default function Navbar() {
 
                     {/* Auth Buttons */}
                     <div className="hidden md:flex items-center gap-3">
+                        <ThemeToggle />
                         {user ? (
                             <div className="flex items-center gap-3">
                                 <Link
@@ -139,17 +154,20 @@ export default function Navbar() {
                     </div>
 
                     {/* Mobile menu button */}
-                    <button
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
-                        aria-label="Toggle menu"
-                    >
-                        <div className="w-5 h-5 flex flex-col justify-center gap-1">
-                            <span className={`block h-0.5 w-full bg-foreground transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
-                            <span className={`block h-0.5 w-full bg-foreground transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`} />
-                            <span className={`block h-0.5 w-full bg-foreground transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
-                        </div>
-                    </button>
+                    <div className="md:hidden flex items-center gap-2">
+                        <ThemeToggle />
+                        <button
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            className="p-2 rounded-lg hover:bg-muted transition-colors"
+                            aria-label="Toggle menu"
+                        >
+                            <div className="w-5 h-5 flex flex-col justify-center gap-1">
+                                <span className={`block h-0.5 w-full bg-foreground transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
+                                <span className={`block h-0.5 w-full bg-foreground transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`} />
+                                <span className={`block h-0.5 w-full bg-foreground transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
+                            </div>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Mobile menu */}
@@ -164,6 +182,13 @@ export default function Navbar() {
                             onClick={() => setIsMenuOpen(false)}
                         >
                             หาบ้านให้สัตว์
+                        </Link>
+                        <Link
+                            href="/blog"
+                            className="rounded-lg px-4 py-2 text-foreground/70 hover:bg-muted hover:text-primary transition-colors"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            บทความ
                         </Link>
                         {user && (
                             <Link

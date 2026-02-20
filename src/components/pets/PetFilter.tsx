@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { THAI_PROVINCES } from '@/lib/thai-provinces';
+import { PET_BREEDS } from '@/lib/data/breeds';
 
 const speciesOptions = [
     { value: '', label: 'ทุกชนิด' },
@@ -52,8 +53,33 @@ export default function PetFilter() {
         [router, searchParams]
     );
 
+    let breedSuggestions: string[] = [];
+    if (currentSpecies && PET_BREEDS[currentSpecies]) {
+        breedSuggestions = PET_BREEDS[currentSpecies];
+    } else {
+        breedSuggestions = Array.from(new Set(Object.values(PET_BREEDS).flat()));
+    }
+
     return (
-        <div className="bg-card rounded-2xl border border-border p-4 sm:p-6 shadow-sm">
+        <div className="bg-card rounded-2xl border border-border p-4 sm:p-6 shadow-sm mb-6">
+            {/* Species filter (Modern Pills) */}
+            <div className="flex flex-wrap items-center gap-2 mb-4 pb-4 border-b border-border text-sm">
+                <span className="text-muted-foreground mr-2 hidden sm:inline-block">หมวดหมู่:</span>
+                {speciesOptions.map((opt) => (
+                    <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => updateFilters('species', opt.value)}
+                        className={`px-4 py-2 rounded-full border font-medium transition-all ${currentSpecies === opt.value || (opt.value === '' && !currentSpecies)
+                            ? 'bg-primary text-white border-primary shadow-md shadow-primary/20 scale-105'
+                            : 'bg-muted border-border hover:border-primary/50 text-foreground hover:bg-background/50'
+                            }`}
+                    >
+                        {opt.label}
+                    </button>
+                ))}
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4">
                 {/* Search */}
                 <div className="flex-1">
@@ -66,24 +92,15 @@ export default function PetFilter() {
                             placeholder="ค้นหาด้วยชื่อ, สายพันธุ์..."
                             defaultValue={currentSearch}
                             onChange={(e) => updateFilters('search', e.target.value)}
+                            list="breed-suggestions"
                             className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
                         />
+                        <datalist id="breed-suggestions">
+                            {breedSuggestions.map((b) => (
+                                <option key={b} value={b} />
+                            ))}
+                        </datalist>
                     </div>
-                </div>
-
-                {/* Species filter */}
-                <div className="sm:w-48">
-                    <select
-                        value={currentSpecies}
-                        onChange={(e) => updateFilters('species', e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm appearance-none cursor-pointer"
-                    >
-                        {speciesOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                            </option>
-                        ))}
-                    </select>
                 </div>
 
                 {/* Province filter */}
